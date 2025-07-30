@@ -89,6 +89,8 @@ def safe_append_and_backup(json_path_local, filename_in_repo, new_entry, unique_
 
         repo_file_path = os.path.join(tmp_dir, filename_in_repo)
 
+        os.makedirs(os.path.dirname(repo_file_path), exist_ok=True)
+
         # Lade existierende Daten
         if os.path.exists(repo_file_path):
             with open(repo_file_path, "r", encoding="utf-8") as f:
@@ -208,7 +210,6 @@ async def save_classification(entry: ClassificationEntry):
     with open(CLASS_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    # Match sentence and append classification
     matched = False
     for item in data:
         if item.get("sentence") == entry.sentence:
@@ -218,6 +219,12 @@ async def save_classification(entry: ClassificationEntry):
                 "classificator": entry.classificator
             })
             matched = True
+
+            try:
+                safe_append_and_backup(CLASS_FILE, "classifications.json", item, unique_key="sentence")
+            except Exception as e:
+                print("[Backup-Fehler in classify]", e)
+
             break
 
     if not matched:
@@ -225,11 +232,6 @@ async def save_classification(entry: ClassificationEntry):
 
     with open(CLASS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-
-    try:
-        safe_append_and_backup(CLASS_FILE, "classifications.json", full_entry_dict, unique_key="sentence")
-    except Exception as e:
-        print("[Backup-Fehler in classify]", e)
 
     return {"status": "success"}
 
