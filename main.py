@@ -17,14 +17,14 @@ from state_dist import change_prob
 
 # ======= Logging vorbereiten ========
 #conversation_history = []
-conversation_log = []
+#conversation_log = []
 
-def save_conversation_log(log_path, conversation_log):
-    try:
-        with open(log_path, "w", encoding="utf-8") as f:
-            json.dump(conversation_log, f, indent=2, ensure_ascii=False)
-    except Exception as e:
-        print("Fehler beim Speichern der Konversation:", e)
+# def save_conversation_log(log_path, conversation_log):
+#     try:
+#         with open(log_path, "w", encoding="utf-8") as f:
+#             json.dump(conversation_log, f, indent=2, ensure_ascii=False)
+#     except Exception as e:
+#         print("Fehler beim Speichern der Konversation:", e)
 
 
 
@@ -291,7 +291,7 @@ def user_classification(prompt):
 # ========== Hauptfunktion ==========
 def chat_IPC_Bot(prompt, changeability, model, conversation_history, llm_icm_state, patient_intro = "", j = 0):
 
-    global conversation_log
+    #global conversation_log
     # global conversation_history
 
     print(conversation_history)
@@ -340,39 +340,39 @@ def chat_IPC_Bot(prompt, changeability, model, conversation_history, llm_icm_sta
         conversation_history = [conversation_history[0]] + conversation_history[-MAX_TURNS*2:]
 
     # === log speichern ===
-    conversation_log.append({
-        "id": str(uuid.uuid4()),
-        "timestamp": datetime.now().isoformat(),
-        "bot": "IPC_Framework",
-        "prompt": prompt,
-        "response": msg,
-        "changeability": changeability,
-        "IPC": {
-            "states": {
-                "user": {
-                    "friendliness": int(user_icm_state[0]),
-                    "dominance": int(user_icm_state[1])
-                },
-                "chatbot": {
-                    "friendliness": int(new_llm_state[0]),
-                    "dominance": int(new_llm_state[1])
-                },
-                "probability_dists": {
-                    "friendliness": prob_dist[0],
-                    "dominance": prob_dist[1]
-                }
-            }
-        }
-    })
+    # conversation_log.append({
+    #     "id": str(uuid.uuid4()),
+    #     "timestamp": datetime.now().isoformat(),
+    #     "bot": "IPC_Framework",
+    #     "prompt": prompt,
+    #     "response": msg,
+    #     "changeability": changeability,
+    #     "IPC": {
+    #         "states": {
+    #             "user": {
+    #                 "friendliness": int(user_icm_state[0]),
+    #                 "dominance": int(user_icm_state[1])
+    #             },
+    #             "chatbot": {
+    #                 "friendliness": int(new_llm_state[0]),
+    #                 "dominance": int(new_llm_state[1])
+    #             },
+    #             "probability_dists": {
+    #                 "friendliness": prob_dist[0],
+    #                 "dominance": prob_dist[1]
+    #             }
+    #         }
+    #     }
+    # })
 
 
-    log_dir = "/Users/finnole/Uni/Sem_8/Bachelor/chatlogs"
-    os.makedirs(log_dir, exist_ok=True)
+    # log_dir = "/Users/finnole/Uni/Sem_8/Bachelor/chatlogs"
+    # os.makedirs(log_dir, exist_ok=True)
 
-    log_filename = datetime.now().strftime("chatlog_%Y%m%d_%H%M%S.json")
-    log_path = os.path.join(log_dir, log_filename)
+    # log_filename = datetime.now().strftime("chatlog_%Y%m%d_%H%M%S.json")
+    # log_path = os.path.join(log_dir, log_filename)
 
-    save_conversation_log(log_path, conversation_log)
+    # save_conversation_log(log_path, conversation_log)
 
     return msg, [user_icm_state[0], user_icm_state[1]], new_llm_state, conversation_history, patient_intro
 
@@ -410,21 +410,21 @@ def chat_standard_bot(prompt, conversation_history, model):
     if len(conversation_history) > MAX_TURNS * 2:
         conversation_history = [conversation_history[0]] + conversation_history[-MAX_TURNS*2:]
 
-    conversation_log.append({
-        "id": str(uuid.uuid4()),
-        "timestamp": datetime.now().isoformat(),
-        "bot": "gpt_default",
-        "prompt": prompt,
-        "response": answer
-    })
+    # conversation_log.append({
+    #     "id": str(uuid.uuid4()),
+    #     "timestamp": datetime.now().isoformat(),
+    #     "bot": "gpt_default",
+    #     "prompt": prompt,
+    #     "response": answer
+    # })
 
-    log_dir = "/Users/finnole/Uni/Sem_8/Bachelor/chatlogs/no_ipc"
-    os.makedirs(log_dir, exist_ok=True)
+    # log_dir = "/Users/finnole/Uni/Sem_8/Bachelor/chatlogs/no_ipc"
+    # os.makedirs(log_dir, exist_ok=True)
 
-    log_filename = datetime.now().strftime("chatlog_%Y%m%d_%H%M%S.json")
-    log_path = os.path.join(log_dir, log_filename)
+    # log_filename = datetime.now().strftime("chatlog_%Y%m%d_%H%M%S.json")
+    # log_path = os.path.join(log_dir, log_filename)
 
-    save_conversation_log(log_path, conversation_log)
+    # save_conversation_log(log_path, conversation_log)
     return answer, conversation_history
 
 
