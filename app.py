@@ -72,34 +72,54 @@ class UserInfo(BaseModel):
 
 
 
-def git_backup(file_path, filename_in_repo):
+def safe_append_and_backup(json_path_local, filename_in_repo, new_entry, unique_key=None):
     try:
         repo_url = os.environ["GITHUB_REPO_URL"]
         token = os.environ["GITHUB_BACKUP_TOKEN"]
-
-        # Temporäres Verzeichnis klonen
         tmp_dir = "/tmp/github_backup"
+
         if os.path.exists(tmp_dir):
             shutil.rmtree(tmp_dir)
 
         clone_url = repo_url.replace("https://", f"https://x-access-token:{token}@")
         subprocess.run(["git", "clone", clone_url, tmp_dir], check=True)
 
-        subprocess.run(["git", "-C", tmp_dir, "config", "user.email", "noreply@render.local"], check=True)
-        subprocess.run(["git", "-C", tmp_dir, "config", "user.name", "AutoCommit"], check=True)
+        subprocess.run(["git", "-C", tmp_dir, "config", "user.name", "Backup Bot"], check=True)
+        subprocess.run(["git", "-C", tmp_dir, "config", "user.email", "backup@localhost"], check=True)
 
-        # Datei hineinkopieren
-        shutil.copy(file_path, os.path.join(tmp_dir, filename_in_repo))
+        repo_file_path = os.path.join(tmp_dir, filename_in_repo)
 
-        # Commit & Push
-        subprocess.run(["git", "-C", tmp_dir, "add", filename_in_repo], check=True)
-        subprocess.run(["git", "-C", tmp_dir, "commit", "-m", f"Backup {filename_in_repo} {datetime.utcnow()}"], check=True)
-        subprocess.run(["git", "-C", tmp_dir, "push"], check=True)
+        # Lade existierende Daten
+        if os.path.exists(repo_file_path):
+            with open(repo_file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        else:
+            data = []
 
-        print(f"[Backup] Erfolgreich gesichert: {filename_in_repo}")
+        # Prüfe auf Duplikat
+        if unique_key:
+            exists = any(entry.get(unique_key) == new_entry.get(unique_key) for entry in data)
+        else:
+            exists = False  # Immer hinzufügen, wenn kein Key
+
+        if not exists:
+            data.append(new_entry)
+
+            with open(repo_file_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+
+            subprocess.run(["git", "-C", tmp_dir, "add", filename_in_repo], check=True)
+            subprocess.run(["git", "-C", tmp_dir, "commit", "-m", f"Update {filename_in_repo}"], check=True)
+            subprocess.run(["git", "-C", tmp_dir, "push"], check=True)
+
+            print(f"[Backup] {filename_in_repo} erfolgreich aktualisiert.")
+        else:
+            print(f"[Backup] Kein Update notwendig für {filename_in_repo}, Eintrag existiert bereits.")
 
     except Exception as e:
         print("[Backup-Fehler]", e)
+
+
 
 
 
@@ -126,7 +146,7 @@ async def register_user(info: UserInfo):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
     try:
-        git_backup(USER_FILE, "users.json")
+        safe_append_and_backup(USER_FILE, "users.json", info.dict(), unique_key="id")
     except Exception as e:
         print("[Backup-Fehler in register-user]", e)
 
@@ -161,17 +181,20 @@ def save_dialogue(payload: dict):
     filename = f"chatlog_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{index}.json"
     path = os.path.join(LOG_DIR, filename)
     print("Empfangener user_id:", user_id)
+
     log = {
         "dialogue": dialogue,
         "bot": bot,
         "userid": user_id,
-        "evaluation": []
+        "evaluation": [],
+        "filename": filename  # wichtig für unique_key
     }
+
     with open(path, "w", encoding="utf-8") as f:
         json.dump(log, f, indent=2, ensure_ascii=False)
-    
+
     try:
-        git_backup(path, f"chatlogs/{filename}")
+        safe_append_and_backup(path, f"chatlogs/{filename}", log, unique_key="filename")
     except Exception as e:
         print("[Backup-Fehler in save-dialogue]", e)
 
@@ -204,7 +227,7 @@ async def save_classification(entry: ClassificationEntry):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
     try:
-        git_backup(CLASS_FILE, "classifications.json")
+        safe_append_and_backup(CLASS_FILE, "classifications.json", full_entry_dict, unique_key="sentence")
     except Exception as e:
         print("[Backup-Fehler in classify]", e)
 
@@ -226,11 +249,12 @@ def evaluate(entry: Evaluation):
             f.seek(0)
             json.dump(data, f, indent=2, ensure_ascii=False)
             f.truncate()
+
         try:
-            git_backup(path, f"chatlogs/{log_filename}")
+            safe_append_and_backup(path, f"chatlogs/{log_filename}", data, unique_key="filename")
         except Exception as e:
             print("[Backup-Fehler in evaluate]", e)
-        
+
         return {"status": "evaluated"}
 
     return {"error": "log file not found"}
@@ -252,7 +276,7 @@ async def save_evaluation_summary(summary: EvaluationSummary):
             json.dump(summaries, f, indent=2, ensure_ascii=False)
 
         try:
-            git_backup(SUMMARY_FILE, "evaluation_summary.json")
+            safe_append_and_backup(SUMMARY_FILE, "evaluation_summary.json", summary.dict(), unique_key=None)
         except Exception as e:
             print("[Backup-Fehler in evaluate-summary]", e)
 
@@ -268,7 +292,7 @@ def download(kind: str):
     if kind == "classification":
         path = CLASS_FILE
     elif kind == "evaluation":
-        path = EVAL_FILE
+        path = LOG_DIR
     elif kind == "users":
         path = USER_FILE
     else:
