@@ -33,8 +33,8 @@ def save_conversation_log(log_path, conversation_log):
 load_dotenv()  # lädt automatisch aus `.env`
 
 # --- Key for UNiGPT + url change ---
-api_key = os.getenv("UNI_API_KEY")
-base_url = os.getenv("BASE_URL")
+api_key = os.environ.get("UNI_API_KEY")
+base_url = os.environ.get("BASE_URL")
 
 ipc_descriptions = {
     (0, 0): "Extrem zurückhaltend, sanft, vertrauensvoll – wirkt unsicher, fügt sich ruhig, sucht Nähe.",
