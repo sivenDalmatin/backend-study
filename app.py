@@ -85,6 +85,9 @@ def git_backup(file_path, filename_in_repo):
         clone_url = repo_url.replace("https://", f"https://x-access-token:{token}@")
         subprocess.run(["git", "clone", clone_url, tmp_dir], check=True)
 
+        subprocess.run(["git", "-C", tmp_dir, "config", "user.email", "noreply@render.local"], check=True)
+        subprocess.run(["git", "-C", tmp_dir, "config", "user.name", "AutoCommit"], check=True)
+
         # Datei hineinkopieren
         shutil.copy(file_path, os.path.join(tmp_dir, filename_in_repo))
 
@@ -199,7 +202,7 @@ async def save_classification(entry: ClassificationEntry):
 
     with open(CLASS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-        
+
     try:
         git_backup(CLASS_FILE, "classifications.json")
     except Exception as e:
