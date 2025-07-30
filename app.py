@@ -7,8 +7,14 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
+import subprocess
+import shutil
 from main import generate_IPC_bot_response, generate_gpt_default, generate_diff_change_prob
 from typing import Optional
+
+
+
+
 
 app = FastAPI()
 
@@ -64,6 +70,36 @@ class UserInfo(BaseModel):
     field: str
     id: str
 
+
+
+def git_backup(file_path, filename_in_repo):
+    try:
+        repo_url = os.environ["GITHUB_REPO_URL"]
+        token = os.environ["GITHUB_BACKUP_TOKEN"]
+
+        # Temporäres Verzeichnis klonen
+        tmp_dir = "/tmp/github_backup"
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir)
+
+        clone_url = repo_url.replace("https://", f"https://x-access-token:{token}@")
+        subprocess.run(["git", "clone", clone_url, tmp_dir], check=True)
+
+        # Datei hineinkopieren
+        shutil.copy(file_path, os.path.join(tmp_dir, filename_in_repo))
+
+        # Commit & Push
+        subprocess.run(["git", "-C", tmp_dir, "add", filename_in_repo], check=True)
+        subprocess.run(["git", "-C", tmp_dir, "commit", "-m", f"Backup {filename_in_repo} {datetime.utcnow()}"], check=True)
+        subprocess.run(["git", "-C", tmp_dir, "push"], check=True)
+
+        print(f"[Backup] Erfolgreich gesichert: {filename_in_repo}")
+
+    except Exception as e:
+        print("[Backup-Fehler]", e)
+
+
+
 @app.get("/sentences")
 async def get_sentences():
     if not os.path.exists(CLASS_FILE):
@@ -85,6 +121,11 @@ async def register_user(info: UserInfo):
 
     with open(USER_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+
+    try:
+        git_backup(USER_FILE, "users.json")
+    except Exception as e:
+        print("[Backup-Fehler in register-user]", e)
 
     return {"status": "saved"}
 
@@ -125,6 +166,11 @@ def save_dialogue(payload: dict):
     }
     with open(path, "w", encoding="utf-8") as f:
         json.dump(log, f, indent=2, ensure_ascii=False)
+    
+    try:
+        git_backup(path, f"chatlogs/{filename}")
+    except Exception as e:
+        print("[Backup-Fehler in save-dialogue]", e)
 
     return {"status": "saved", "filename": filename}
 
@@ -153,6 +199,11 @@ async def save_classification(entry: ClassificationEntry):
 
     with open(CLASS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+        
+    try:
+        git_backup(CLASS_FILE, "classifications.json")
+    except Exception as e:
+        print("[Backup-Fehler in classify]", e)
 
     return {"status": "success"}
 
@@ -172,6 +223,11 @@ def evaluate(entry: Evaluation):
             f.seek(0)
             json.dump(data, f, indent=2, ensure_ascii=False)
             f.truncate()
+        try:
+            git_backup(path, f"chatlogs/{log_filename}")
+        except Exception as e:
+            print("[Backup-Fehler in evaluate]", e)
+        
         return {"status": "evaluated"}
 
     return {"error": "log file not found"}
@@ -191,6 +247,11 @@ async def save_evaluation_summary(summary: EvaluationSummary):
 
         with open(SUMMARY_FILE, "w", encoding="utf-8") as f:
             json.dump(summaries, f, indent=2, ensure_ascii=False)
+
+        try:
+            git_backup(SUMMARY_FILE, "evaluation_summary.json")
+        except Exception as e:
+            print("[Backup-Fehler in evaluate-summary]", e)
 
         return {"status": "success"}
 
