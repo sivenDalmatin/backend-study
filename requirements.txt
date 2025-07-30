@@ -1,5 +1,7 @@
 fastapi
-uvicorn
+uvicorn[standard]
+pydantic
+python-multipart
 numpy
 matplotlib
 openai
