@@ -50,10 +50,12 @@ class Evaluation(BaseModel):
     consistency: int
     feedback: str
     log_filename: str
+    ipc_d_guess: Optional[int] = None
+    ipc_f_guess: Optional[int] = None
 
 class EvaluationSummary(BaseModel):
     user_id: str
-    best: str
+    ranking: str
     reason: str
     diversity: int
 
