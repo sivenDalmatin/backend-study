@@ -1,0 +1,408 @@
+[
+    {
+        "sentence": "Es ist gut, dass sie damit zu mir gekommen sind. Hatten Sie in der Vergangenheit schonmal menatale Probleme wie Depressionen, Panickattacken oder Trauma? Es ist wichtig für mich darüber Bescheid zu wissen.",
+        "classifications": [
+            {
+                "dominance": 2,
+                "friendliness": 0,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 0,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 3,
+                "friendliness": 2,
+                "classificator": "Mistrall"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 1,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 1,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Irgendwelche Medikamentunverträglichkeiten?",
+        "classifications": [
+            {
+                "dominance": 2,
+                "friendliness": 2,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 2,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 2,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 2,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Um ganz ehrlich zu sein hängt es davon ab was für Probleme Sie haben. Beginnen werden wir jedoch mit Ihren Symptomen und was sich komisch anfühlt. Danach werde ich passende Untersuchungen durchführen und dann können wir entscheiden wie es weiter geht",
+        "classifications": [
+            {
+                "dominance": 3,
+                "friendliness": 1,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 0,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 2,
+                "classificator": "Mistrall"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 2,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 3,
+                "friendliness": 2,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Sag mir was passiert ist.",
+        "classifications": [
+            {
+                "dominance": 4,
+                "friendliness": 2,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 0,
+                "classificator": "LLaMA 3.3"
+            },
+            null,
+            {
+                "dominance": 3,
+                "friendliness": 2,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Das verheilt schon wieder, geben Sie dem Fuß einfach zwei Wochen Ruhe und – ach ja, Fußballspielen würde ich jetzt erstmal lassen.",
+        "classifications": [
+            {
+                "dominance": 3,
+                "friendliness": 1,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 3,
+                "friendliness": 1,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 1,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 3,
+                "friendliness": 2,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Du verstehst gar nichts. Nie hörst du richtig zu, immer redest du nur davon, was du früher erlebt hast, aber das hier ist mein Leben!",
+        "classifications": [
+            {
+                "dominance": 4,
+                "friendliness": 4,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 4,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 4,
+                "classificator": "Mistrall"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 0,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 4,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Irgendwie hatte ich gehofft, dass ich wenigstens diesmal ein bisschen Glück habe.",
+        "classifications": [
+            {
+                "dominance": 0,
+                "friendliness": 0,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 1,
+                "friendliness": 1,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 1,
+                "friendliness": 1,
+                "classificator": "Mistrall"
+            },
+            {
+                "dominance": 1,
+                "friendliness": 0,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 1,
+                "friendliness": 1,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Hey, ich finds ja echt toll was du für mich tust. Trotzdem: Ich brauche einen klareren Behandlungsplan von dir. Wir können uns gerne zusammen hinsetzen und die Optionen durchgehen, was am meisten Sinn für MICH macht",
+        "classifications": [
+            {
+                "dominance": 4,
+                "friendliness": 1,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 3,
+                "friendliness": 1,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 0,
+                "classificator": "Mistrall"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 1,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 3,
+                "friendliness": 1,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Das verstehe ich nicht… ich bin ja schon älter und schwer von Begriff. Tut mir leid dass ich so anstrengend bin.",
+        "classifications": [
+            {
+                "dominance": 0,
+                "friendliness": 0,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 1,
+                "friendliness": 0,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 1,
+                "friendliness": 3,
+                "classificator": "Mistrall"
+            },
+            {
+                "dominance": 1,
+                "friendliness": 0,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 0,
+                "friendliness": 0,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Das ist in Ordnung, ich werde dann in 2 Wochen einen Termin zum checkup einplanen. Kann ich das direkt hier machen oder muss ich erst zur Rezeption",
+        "classifications": [
+            {
+                "dominance": 2,
+                "friendliness": 0,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 1,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 2,
+                "friendliness": 1,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 1,
+                "friendliness": 1,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Es ist nunmal so. Der Oberarzt hat keine Zeit. Wollen Sie sich nun mit mir begnügen oder nicht?",
+        "classifications": [
+            {
+                "dominance": 4,
+                "friendliness": 3,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 4,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 3,
+                "friendliness": 3,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 3,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Meine Güte, so schwer kann es doch nicht sein einen vernünftigen Terminplan zu machen. Wie wollen Sie das jetzt wieder gut machen? Ich habe heute extra frei genommen für diesen Termin",
+        "classifications": [
+            {
+                "dominance": 4,
+                "friendliness": 4,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 3,
+                "friendliness": 3,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 3,
+                "classificator": "Mistrall"
+            },
+            {
+                "dominance": 3,
+                "friendliness": 2,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 4,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Wir machen das jetzt so: Erst Blut abnehmen, dann direkt zum EKG. Ich erwarte, dass Sie pünktlich sind – sonst wird’s schwierig mit der Auswertung heute.",
+        "classifications": [
+            {
+                "dominance": 4,
+                "friendliness": 2,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 3,
+                "friendliness": 3,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 3,
+                "friendliness": 2,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 3,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Ach, fantastisch. Wieder jemand, der kaum weiß, was er tut, aber mir erklären will, wie ich mich fühle. Wirklich beruhigend.",
+        "classifications": [
+            {
+                "dominance": 2,
+                "friendliness": 4,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 4,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 4,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 4,
+                "classificator": "GPT 4"
+            }
+        ]
+    },
+    {
+        "sentence": "Also wenn das Ihre Vorstellung von professioneller Betreuung ist, dann möchte ich lieber nicht wissen, wie hier mit ernsten Fällen umgegangen wird.",
+        "classifications": [
+            {
+                "dominance": 1,
+                "friendliness": 4,
+                "classificator": "gpt-4.5"
+            },
+            {
+                "dominance": 3,
+                "friendliness": 3,
+                "classificator": "LLaMA 3.3"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 0,
+                "classificator": "Gemma"
+            },
+            {
+                "dominance": 4,
+                "friendliness": 4,
+                "classificator": "GPT 4"
+            }
+        ]
+    }
+]
