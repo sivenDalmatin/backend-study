@@ -191,7 +191,7 @@ def save_dialogue(payload: dict):
 def evaluate(entry: Evaluation):
     timestamp = datetime.utcnow().isoformat()
     entry_dict = entry.dict()
-    log_filename = entry_dict.pop("log_filename")
+    log_filename = entry.log_filename
     entry_dict["evaluator"] = "human"
     entry_dict["timestamp"] = timestamp
 
