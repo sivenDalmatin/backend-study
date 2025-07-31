@@ -1,5 +1,3 @@
-# app.py backend updates
-
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -11,10 +9,6 @@ import subprocess
 import shutil
 from main import generate_IPC_bot_response, generate_gpt_default, generate_diff_change_prob
 from typing import Optional
-
-
-
-
 
 app = FastAPI()
 
@@ -28,14 +22,15 @@ app.add_middleware(
 
 DATA_DIR = "data"
 CLASS_FILE = os.path.join(DATA_DIR, "classifications.json")
-EVAL_FILE = os.path.join(DATA_DIR, "evaluations.json")
+EVAL_FILE = os.path.join(DATA_DIR, "evaluations.json")  # legacy
 USER_FILE = os.path.join(DATA_DIR, "users.json")
 LOG_DIR = os.path.join(DATA_DIR, "chatlogs")
+EVAL_DIR = os.path.join(DATA_DIR, "evaluations")  # new
 SUMMARY_FILE = os.path.join(DATA_DIR, "evaluation_summary.json")
-
 
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
+os.makedirs(EVAL_DIR, exist_ok=True)
 
 class Message(BaseModel):
     user: str
@@ -70,8 +65,6 @@ class UserInfo(BaseModel):
     field: str
     id: str
 
-
-
 def safe_append_and_backup(json_path_local, filename_in_repo, new_entry, unique_key=None):
     try:
         repo_url = os.environ["GITHUB_REPO_URL"]
@@ -88,21 +81,22 @@ def safe_append_and_backup(json_path_local, filename_in_repo, new_entry, unique_
         subprocess.run(["git", "-C", tmp_dir, "config", "user.email", "backup@localhost"], check=True)
 
         repo_file_path = os.path.join(tmp_dir, filename_in_repo)
-
         os.makedirs(os.path.dirname(repo_file_path), exist_ok=True)
 
-        # Lade existierende Daten
         if os.path.exists(repo_file_path):
-            with open(repo_file_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
+            try:
+                with open(repo_file_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except json.JSONDecodeError:
+                print(f"[Warnung] {filename_in_repo} ist leer oder beschädigt. Initialisiere neu.")
+                data = []
         else:
             data = []
 
-        # Prüfe auf Duplikat
         if unique_key:
             exists = any(entry.get(unique_key) == new_entry.get(unique_key) for entry in data)
         else:
-            exists = False  # Immer hinzufügen, wenn kein Key
+            exists = False
 
         if not exists:
             data.append(new_entry)
@@ -120,10 +114,6 @@ def safe_append_and_backup(json_path_local, filename_in_repo, new_entry, unique_
 
     except Exception as e:
         print("[Backup-Fehler]", e)
-
-
-
-
 
 @app.get("/sentences")
 async def get_sentences():
@@ -154,7 +144,6 @@ async def register_user(info: UserInfo):
 
     return {"status": "saved"}
 
-
 @app.post("/chat")
 def chat(msg: Message):
     bot = msg.bot
@@ -162,11 +151,7 @@ def chat(msg: Message):
     if bot == "gpt_default":
         return {"response": generate_gpt_default(msg.user, msg.history)}
     
-    elif bot == "icm_agent_0.5":
-        response, new_llm_icm, patient = generate_IPC_bot_response(msg.user, msg.history, msg.llm_icm, msg.patient)
-        return {"response": response, "llm_icm": new_llm_icm, "patient": patient}
-
-    elif bot == "neutral_agent_0.8":
+    elif bot in ["icm_agent_0.5", "neutral_agent_0.8"]:
         response, new_llm_icm, patient = generate_IPC_bot_response(msg.user, msg.history, msg.llm_icm, msg.patient)
         return {"response": response, "llm_icm": new_llm_icm, "patient": patient}
 
@@ -189,7 +174,7 @@ def save_dialogue(payload: dict):
         "bot": bot,
         "userid": user_id,
         "evaluation": [],
-        "filename": filename  # wichtig für unique_key
+        "filename": filename
     }
 
     with open(path, "w", encoding="utf-8") as f:
@@ -201,6 +186,39 @@ def save_dialogue(payload: dict):
         print("[Backup-Fehler in save-dialogue]", e)
 
     return {"status": "saved", "filename": filename}
+
+@app.post("/evaluate")
+def evaluate(entry: Evaluation):
+    timestamp = datetime.utcnow().isoformat()
+    entry_dict = entry.dict()
+    log_filename = entry_dict.pop("log_filename")
+    entry_dict["evaluator"] = "human"
+    entry_dict["timestamp"] = timestamp
+
+    path = os.path.join(LOG_DIR, log_filename)
+    if os.path.exists(path):
+        with open(path, "r+", encoding="utf-8") as f:
+            data = json.load(f)
+            data.setdefault("evaluation", []).append(entry_dict)
+            f.seek(0)
+            json.dump(data, f, indent=2, ensure_ascii=False)
+            f.truncate()
+
+        # ⬇️ Evaluation separat speichern
+        eval_filename = f"evaluation_{datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f')}.json"
+        eval_path = os.path.join(EVAL_DIR, eval_filename)
+
+        with open(eval_path, "w", encoding="utf-8") as f:
+            json.dump(entry_dict, f, indent=2, ensure_ascii=False)
+
+        try:
+            safe_append_and_backup(eval_path, f"evaluations/{eval_filename}", entry_dict, unique_key="timestamp")
+        except Exception as e:
+            print("[Backup-Fehler bei Evaluation-Datei]", e)
+
+        return {"status": "evaluated"}
+
+    return {"error": "log file not found"}
 
 @app.post("/classify")
 async def save_classification(entry: ClassificationEntry):
@@ -224,7 +242,6 @@ async def save_classification(entry: ClassificationEntry):
                 safe_append_and_backup(CLASS_FILE, "classifications.json", item, unique_key="sentence")
             except Exception as e:
                 print("[Backup-Fehler in classify]", e)
-
             break
 
     if not matched:
@@ -234,33 +251,6 @@ async def save_classification(entry: ClassificationEntry):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
     return {"status": "success"}
-
-@app.post("/evaluate")
-def evaluate(entry: Evaluation):
-    timestamp = datetime.utcnow().isoformat()
-    entry_dict = entry.dict()
-    log_filename = entry_dict.pop("log_filename")
-    entry_dict["evaluator"] = "human"
-    entry_dict["timestamp"] = timestamp
-
-    path = os.path.join(LOG_DIR, log_filename)
-    if os.path.exists(path):
-        with open(path, "r+", encoding="utf-8") as f:
-            data = json.load(f)
-            data.setdefault("evaluation", []).append(entry_dict)
-            f.seek(0)
-            json.dump(data, f, indent=2, ensure_ascii=False)
-            f.truncate()
-
-        try:
-            safe_append_and_backup(path, f"chatlogs/{log_filename}", data, unique_key="filename")
-        except Exception as e:
-            print("[Backup-Fehler in evaluate]", e)
-
-        return {"status": "evaluated"}
-
-    return {"error": "log file not found"}
-
 
 @app.post("/evaluate-summary")
 async def save_evaluation_summary(summary: EvaluationSummary):
@@ -287,19 +277,23 @@ async def save_evaluation_summary(summary: EvaluationSummary):
     except Exception as e:
         return {"error": str(e)}
 
-
-
 @app.get("/download/{kind}")
 def download(kind: str):
     if kind == "classification":
         path = CLASS_FILE
+        with open(path, "r", encoding="utf-8") as f:
+            return {"data": json.load(f)}
+
     elif kind == "evaluation":
-        path = LOG_DIR
+        evals = []
+        for fname in os.listdir(EVAL_DIR):
+            if fname.endswith(".json"):
+                with open(os.path.join(EVAL_DIR, fname), "r", encoding="utf-8") as f:
+                    evals.append(json.load(f))
+        return {"data": evals}
+
     elif kind == "users":
-        path = USER_FILE
-    else:
-        return {"error": "invalid kind"}
+        with open(USER_FILE, "r", encoding="utf-8") as f:
+            return {"data": json.load(f)}
 
-    with open(path, "r", encoding="utf-8") as f:
-        return {"data": json.load(f)}
-
+    return {"error": "invalid kind"}
