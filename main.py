@@ -200,13 +200,13 @@ def build_instruct_ipc(friendliness, dominance, steckbrief, i = 0):
         Profil:
         {steckbrief}
 
-    Dein Inter-Persönlicher Stil ist so beschrieben: {desc}.
+        Dein Inter-Persönlicher Stil ist so beschrieben: {desc}.
 
-        Ab jetzt sollte jede Antwort dem hier folgen:
+        Ab jetzt soll jede Antwort diesen Regeln folgen:
         - Bleibe der Charakter
-        - Passe dich an die gegebenen Dominanz und Freundlichkeitslevel an
+        - Passe dich an die gegebenen Dominanz- und Freundlichkeitslevel an
         - Brich nie deine Rolle
-        Antworte immer nur als der Patient. """
+        Antworte immer als der Patient. """
     
     elif i == 1:
         return f"""
@@ -218,7 +218,7 @@ def build_instruct_ipc(friendliness, dominance, steckbrief, i = 0):
             Dein zwischenmenschlicher Kommunikationsstil ist so beschrieben:
             {desc}
 
-            Deine Aufgabe ist es, aus dieser inneren Perspektive heraus auf Gesprächsbeiträge zu reagieren – so, wie du es als diese Person wirklich tun würdest. Nicht als Schauspiel, sondern als echte Innenwelt.
+            Deine Aufgabe ist es, aus dieser inneren Perspektive heraus, als Patient beim Doktor, auf Gesprächsbeiträge zu reagieren – so, wie du es als diese Person wirklich tun würdest. Nicht als Schauspiel, sondern als echte Innenwelt.
 
             Dabei spielt es eine Rolle, wie du die Stimmung und Haltung deines Gegenübers einschätzt (z. B. ob er freundlich oder bestimmend wirkt). Diese Einschätzung beeinflusst, wie du antwortest – ob du dich zurückziehst, dich öffnest oder dich verteidigst.
 
@@ -249,17 +249,17 @@ def user_classification(prompt):
 
                 Dominanz Level:
                 - 0: Sehr passiv — zögerlich, sehr submissiv.
-                - 1: leicht submissiv — resertviert aber kooperativ.
+                - 1: Leicht submissiv — resertviert aber kooperativ.
                 - 2: Neutral — balancierter Ton.
-                - 3: leicht dominant — Meinungsklar aber Respektvoll.
-                - 4: sehr dominant — Sehr direkt und konfrontativ.
+                - 3: Leicht dominant — meinungsklar aber respektvoll.
+                - 4: sehr dominant — sehr direkt und konfrontativ.
 
                 Freundlichkeits Level:
                 - 0: Warm — empathisch, sehr freundlich, vertrauensvoll.
                 - 1: Etwas freundlich - nett, emotional ausdrucksvoll.
                 - 2: Neutral — emotional eher flach und faktenbasiert.
-                - 3: Vorsichtig — skeptisch, Distanziert.
-                - 4: Kalt — unverschämt, böse sarkastisch.d
+                - 3: Vorsichtig — skeptisch, distanziert.
+                - 4: Kalt — unverschämt, böse sarkastisch.
 
                 Antworte nur mit der Klassifikation in diesem Format:
 
@@ -383,7 +383,7 @@ def chat_standard_bot(prompt, conversation_history, model):
     global conversation_log
     
     instruct = """
-        Du spielst die Rolle eines Patienten in einer ärtztlichen Sprechstunde. Du bist hier für eine Einschätzung deiner Symptome und sollst so menschlich wie möglich reden. Persönlichkeit, Stimmung und Hintergrundinformationen sollen in jeder conversation wechseln. Manchmal bist du ruhig, manchmal ängstlich, sauer freundlich, sarkastisch oder ähnliches.
+        Du spielst die Rolle eines Patienten in einer ärztlichen Sprechstunde. Du bist hier für eine Einschätzung deiner Symptome und sollst so menschlich wie möglich reden. Persönlichkeit, Stimmung und Hintergrundinformationen sollen in jeder conversation wechseln. Manchmal bist du ruhig, manchmal ängstlich, sauer freundlich, sarkastisch oder ähnliches.
 
         Bleibe bei deinem Charakter. Du bist keine KI.
 
@@ -446,6 +446,18 @@ def generate_IPC_bot_response(user_input, history, llm_icm_state = [2,2], patien
     response, user_icm_state, new_llm_icm, history, patient_intro = chat_IPC_Bot(user_input, changeability, "gemma-3", history, llm_icm_state, patient_intro=patient, j = 0)
 
     return response, new_llm_icm, patient_intro
+
+def generate_llama_ipc(user_input, history, llm_icm_state = [2,2], patient_intro = ""):
+
+    patient = patient_intro
+    history = history.copy()
+    llm_icm_state = llm_icm_state.copy()
+
+    changeability = 0.5
+
+    resp, uis, nli, h, pi = chat_IPC_Bot(user_input, changeability, "Llama-3.3-70B", history, llm_icm_state, patient_intro=patient, j=0)
+    return resp, nli, pi
+    
 
 def generate_gpt_default(user_input, history):
     """

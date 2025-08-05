@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 import subprocess
 import shutil
-from main import generate_IPC_bot_response, generate_gpt_default, generate_diff_change_prob
+from main import generate_IPC_bot_response, generate_gpt_default, generate_llama_ipc
 from typing import Optional
 
 app = FastAPI()
@@ -154,6 +154,9 @@ def chat(msg: Message):
     elif bot in ["icm_agent_0.5", "neutral_agent_0.8"]:
         response, new_llm_icm, patient = generate_IPC_bot_response(msg.user, msg.history, msg.llm_icm, msg.patient)
         return {"response": response, "llm_icm": new_llm_icm, "patient": patient}
+    
+    elif bot == 'llama_agent':
+        response, new_llm_icm, patient = generate_llama_ipc(msg.user, msg.history, msg.llm_icm, msg.patient)
 
     else:
         return {"response": f"[Error] Unknown bot type: {bot}"}
