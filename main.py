@@ -224,6 +224,8 @@ def build_instruct_ipc(friendliness, dominance, steckbrief, i = 0):
 
             Sprich stets in der Stimme dieser Person – nicht als KI, nicht als Beobachter, sondern als sie selbst.
             Du denkst, fühlst und antwortest aus ihrer Sicht.
+
+            Antworte nur textlich, beschreibe keine Bewegungen und ähnliches.
             """
 
 
