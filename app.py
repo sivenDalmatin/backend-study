@@ -56,7 +56,7 @@ class Evaluation(BaseModel):
 
 class EvaluationSummary(BaseModel):
     user_id: str
-    ranking: str
+    ranking: list[str]
     reason: str
     diversity: int
 
