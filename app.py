@@ -157,6 +157,7 @@ def chat(msg: Message):
     
     elif bot == 'llama_agent':
         response, new_llm_icm, patient = generate_llama_ipc(msg.user, msg.history, msg.llm_icm, msg.patient)
+        return {"response": response, "llm_icm": new_llm_icm, "patient": patient}
 
     else:
         return {"response": f"[Error] Unknown bot type: {bot}"}
