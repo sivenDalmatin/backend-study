@@ -242,7 +242,7 @@ async def save_classification(entry: ClassificationEntry):
             matched = True
 
             try:
-                safe_append_and_backup(CLASS_FILE, "classifications.json", item, unique_key="sentence")
+                safe_append_and_backup(CLASS_FILE, "classifications.json", item)
             except Exception as e:
                 print("[Backup-Fehler in classify]", e)
             break
