@@ -69,6 +69,9 @@ class UserInfo(BaseModel):
 class FinalConfirmation(BaseModel):
     userId: str
     confirmation: bool
+    vpStunden: Optional[bool] = False
+    vpName: Optional[str] = None
+    vpEmail: Optional[str] = None
 
 def safe_append_and_backup(json_path_local, filename_in_repo, new_entry, unique_key=None):
     try:
@@ -299,6 +302,11 @@ async def final_confirmation(data: FinalConfirmation):
         for user in users:
             if user.get("id") == data.userId:
                 user["finalConfirmation"] = data.confirmation
+                user["vpStunden"] = data.vpStunden or False
+
+                if data.vpStunden:
+                    user["vpName"] = data.vpName
+                    user["vpEmail"] = data.vpEmail
                 updated = True
                 break
 
@@ -309,7 +317,7 @@ async def final_confirmation(data: FinalConfirmation):
             json.dump(users, f, indent=2, ensure_ascii=False)
 
         try:
-            safe_append_and_backup(USER_FILE, "users.json", {"id": data.userId, "finalConfirmation": data.confirmation}, unique_key="id")
+            safe_append_and_backup(USER_FILE, "users.json", user, unique_key="id")
         except Exception as e:
             print("[Backup-Fehler in final-confirmation]", e)
 
