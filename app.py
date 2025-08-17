@@ -66,6 +66,10 @@ class UserInfo(BaseModel):
     id: str
     gender: str
 
+class FinalConfirmation(BaseModel):
+    userId: str
+    confirmation: bool
+
 def safe_append_and_backup(json_path_local, filename_in_repo, new_entry, unique_key=None):
     try:
         repo_url = os.environ["GITHUB_REPO_URL"]
@@ -278,6 +282,38 @@ async def save_evaluation_summary(summary: EvaluationSummary):
             print("[Backup-Fehler in evaluate-summary]", e)
 
         return {"status": "success"}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.post("/final-confirmation")
+async def final_confirmation(data: FinalConfirmation):
+    try:
+        if not os.path.exists(USER_FILE):
+            return {"error": "users.json nicht gefunden"}, 404
+
+        with open(USER_FILE, "r", encoding="utf-8") as f:
+            users = json.load(f)
+
+        updated = False
+        for user in users:
+            if user.get("id") == data.userId:
+                user["finalConfirmation"] = data.confirmation
+                updated = True
+                break
+
+        if not updated:
+            return {"error": "Benutzer-ID nicht gefunden"}, 404
+
+        with open(USER_FILE, "w", encoding="utf-8") as f:
+            json.dump(users, f, indent=2, ensure_ascii=False)
+
+        try:
+            safe_append_and_backup(USER_FILE, "users.json", {"id": data.userId, "finalConfirmation": data.confirmation}, unique_key="id")
+        except Exception as e:
+            print("[Backup-Fehler in final-confirmation]", e)
+
+        return {"status": "confirmation saved"}
 
     except Exception as e:
         return {"error": str(e)}
