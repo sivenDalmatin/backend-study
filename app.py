@@ -14,7 +14,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://frontend-study-xi.vercel.app"],
+    allow_origins= ["*"],# ["https://frontend-study-xi.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -64,6 +64,7 @@ class UserInfo(BaseModel):
     age: str
     field: str
     id: str
+    gender: str
 
 def safe_append_and_backup(json_path_local, filename_in_repo, new_entry, unique_key=None):
     try:
