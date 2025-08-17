@@ -123,6 +123,57 @@ def safe_append_and_backup(json_path_local, filename_in_repo, new_entry, unique_
     except Exception as e:
         print("[Backup-Fehler]", e)
 
+def safe_update_and_backup(json_path_local, filename_in_repo, new_entry, unique_key):
+    try:
+        repo_url = os.environ["GITHUB_REPO_URL"]
+        token = os.environ["GITHUB_BACKUP_TOKEN"]
+        tmp_dir = "/tmp/github_backup"
+
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir)
+
+        clone_url = repo_url.replace("https://", f"https://x-access-token:{token}@")
+        subprocess.run(["git", "clone", clone_url, tmp_dir], check=True)
+
+        subprocess.run(["git", "-C", tmp_dir, "config", "user.name", "Backup Bot"], check=True)
+        subprocess.run(["git", "-C", tmp_dir, "config", "user.email", "backup@localhost"], check=True)
+
+        repo_file_path = os.path.join(tmp_dir, filename_in_repo)
+        os.makedirs(os.path.dirname(repo_file_path), exist_ok=True)
+
+        if os.path.exists(repo_file_path):
+            try:
+                with open(repo_file_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except json.JSONDecodeError:
+                print(f"[Warnung] {filename_in_repo} ist leer oder beschädigt. Initialisiere neu.")
+                data = []
+        else:
+            data = []
+
+        updated = False
+        for i, entry in enumerate(data):
+            if entry.get(unique_key) == new_entry.get(unique_key):
+                data[i] = new_entry  # 🔁 update
+                updated = True
+                break
+
+        if not updated:
+            data.append(new_entry)  # ➕ append if not found
+
+        with open(repo_file_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+
+        subprocess.run(["git", "-C", tmp_dir, "add", filename_in_repo], check=True)
+        subprocess.run(["git", "-C", tmp_dir, "commit", "-m", f"Update {filename_in_repo}"], check=True)
+        subprocess.run(["git", "-C", tmp_dir, "push"], check=True)
+
+        print(f"[Backup] {filename_in_repo} erfolgreich aktualisiert oder ergänzt.")
+
+    except Exception as e:
+        print("[Backup-Fehler]", e)
+
+
 @app.get("/sentences")
 async def get_sentences():
     if not os.path.exists(CLASS_FILE):
@@ -317,7 +368,7 @@ async def final_confirmation(data: FinalConfirmation):
             json.dump(users, f, indent=2, ensure_ascii=False)
 
         try:
-            safe_append_and_backup(USER_FILE, "users.json", user, unique_key="id")
+            safe_update_and_backup(USER_FILE, "users.json", user, unique_key="id")
         except Exception as e:
             print("[Backup-Fehler in final-confirmation]", e)
 
