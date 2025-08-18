@@ -47,7 +47,6 @@ class ClassificationEntry(BaseModel):
 
 class Evaluation(BaseModel):
     realism: int
-    appropriateness: int
     consistency: int
     feedback: str
     log_filename: str
@@ -302,7 +301,7 @@ async def save_classification(entry: ClassificationEntry):
             matched = True
 
             try:
-                safe_append_and_backup(CLASS_FILE, "classifications.json", item)
+                safe_update_and_backup(CLASS_FILE, "classifications.json", item, item.get("sentence"))
             except Exception as e:
                 print("[Backup-Fehler in classify]", e)
             break
