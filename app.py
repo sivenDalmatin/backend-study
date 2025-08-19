@@ -209,8 +209,12 @@ def chat(msg: Message):
     if bot == "gpt_default":
         return {"response": generate_gpt_default(msg.user, msg.history)}
     
-    elif bot in ["icm_agent_0.5", "neutral_agent_0.8"]:
+    elif bot == "icm_agent_0.5":
         response, new_llm_icm, patient = generate_IPC_bot_response(msg.user, msg.history, msg.llm_icm, msg.patient)
+        return {"response": response, "llm_icm": new_llm_icm, "patient": patient}
+    
+    elif bot == "icm_agent_0.8":
+        response, new_llm_icm, patient = generate_IPC_bot_response(msg.user, msg.history, msg.llm_icm, msg.patient, j = 1)
         return {"response": response, "llm_icm": new_llm_icm, "patient": patient}
     
     elif bot == 'llama_agent':
