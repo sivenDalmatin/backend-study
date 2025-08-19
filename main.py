@@ -487,7 +487,17 @@ def generate_IPC_bot_response(user_input, history, llm_icm_state = [2,2], patien
 
     response, user_icm_state, new_llm_icm, history, patient_intro = chat_IPC_Bot(user_input, changeability, "gemma-3", history, llm_icm_state, patient_intro=patient, j = 0)
 
-    return response, new_llm_icm, patient_intro
+    telemetry = {
+        "user_ipc": {
+            "friendliness": int(user_icm_state[0]),
+            "dominance": int(user_icm_state[1]),
+        },        "bot_ipc_next": {
+            "friendliness": int(new_llm_icm[0]),
+            "dominance": int(new_llm_icm[1]),
+        },
+    }
+
+    return response, new_llm_icm, patient_intro, telemetry
 
 def generate_llama_ipc(user_input, history, llm_icm_state = [2,2], patient_intro = ""):
 
@@ -498,7 +508,18 @@ def generate_llama_ipc(user_input, history, llm_icm_state = [2,2], patient_intro
     changeability = 0.5
 
     resp, uis, nli, h, pi = chat_IPC_Bot(user_input, changeability, "Llama-3.3-70B", history, llm_icm_state, patient_intro=patient, j=0)
-    return resp, nli, pi
+
+    telemetry = {
+        "user_ipc": {
+            "friendliness": int(uis[0]),
+            "dominance": int(uis[1]),
+        },        "bot_ipc_next": {
+            "friendliness": int(nli[0]),
+            "dominance": int(nli[1]),
+        },
+    }
+
+    return resp, nli, pi, telemetry
     
 
 def generate_gpt_default(user_input, history):
@@ -508,6 +529,7 @@ def generate_gpt_default(user_input, history):
     """
     history = history.copy()
     response, blub = chat_standard_bot(user_input, history, "gemma-3")
+
     return response
 
 
