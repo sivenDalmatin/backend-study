@@ -291,20 +291,25 @@ async def save_classification(entry: ClassificationEntry):
         data = json.load(f)
 
     matched = False
-    for item in data:
+
+    for i, item in enumerate(data):
         if item.get("sentence") == entry.sentence:
-            item.setdefault("classifications", []).append({
+            # Ensure the field exists and remove any nulls
+            cls = item.get("classifications", [])
+            if not isinstance(cls, list):
+                cls = []
+            cls = [c for c in cls if c is not None]
+
+            cls.append({
                 "dominance": entry.dominance,
                 "friendliness": entry.friendliness,
                 "classificator": entry.classificator
             })
-            matched = True
 
-            try:
-                safe_update_and_backup(CLASS_FILE, "classifications.json", item, item.get("sentence"))
-            except Exception as e:
-                print("[Backup-Fehler in classify]", e)
-            break
+            item["classifications"] = cls
+            data[i] = item
+            matched = True
+            # ❌ do NOT break; update ALL duplicates
 
     if not matched:
         return {"error": "Sentence not found"}, 404
@@ -312,7 +317,16 @@ async def save_classification(entry: ClassificationEntry):
     with open(CLASS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
+    # ✅ Backup with the correct unique_key name
+    try:
+        for item in data:
+            if item.get("sentence") == entry.sentence:
+                safe_update_and_backup(CLASS_FILE, "classifications.json", item, unique_key="sentence")
+    except Exception as e:
+        print("[Backup-Fehler in classify]", e)
+
     return {"status": "success"}
+
 
 @app.post("/evaluate-summary")
 async def save_evaluation_summary(summary: EvaluationSummary):
