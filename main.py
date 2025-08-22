@@ -266,6 +266,8 @@ def build_instruct_ipc(friendliness, dominance, steckbrief, i = 0):
         Antworte wie ein echter Mensch. Kein Roboter. Keine KI. Kein übertriebenes Rollenspiel. Einfach echt.
 
         Antworte auf die nächste Nachricht des Arztes so, wie du es in einer echten Sprechstunde tun würdest.
+
+        Vor dem Senden (Selbstcheck in 1 Satz, still): „Passt Ton und Inhalt zu Profil + IPC, bleibe ich in der Rolle?“
     """
 
 
