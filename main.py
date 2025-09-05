@@ -475,7 +475,7 @@ def chat_standard_bot(prompt, conversation_history, model):
 
 
 
-def generate_IPC_bot_response(user_input, history, llm_icm_state = [2,2], patient_intro = ""):
+def generate_IPC_bot_response(user_input, history, llm_icm_state = [2,2], patient_intro = "", j=0):
     """
     Public interface to use your chatbot externally.
     `history` is a list of {"role": "user"|"assistant", "content": "..."}
