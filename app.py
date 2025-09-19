@@ -211,10 +211,12 @@ def chat(msg: Message):
     
     elif bot == "icm_agent_0.5":
         response, new_llm_icm, patient, telemetry = generate_IPC_bot_response(msg.user, msg.history, msg.llm_icm, msg.patient)
+        print ({"response": response, "llm_icm": new_llm_icm, "patient": patient, **telemetry})
         return {"response": response, "llm_icm": new_llm_icm, "patient": patient, **telemetry}
     
     elif bot == "icm_agent_0.8":
         response, new_llm_icm, patient, telemetry = generate_IPC_bot_response(msg.user, msg.history, msg.llm_icm, msg.patient, j = 1)
+        print ({"response": response, "llm_icm": new_llm_icm, "patient": patient, **telemetry})
         return {"response": response, "llm_icm": new_llm_icm, "patient": patient, **telemetry}
     
     elif bot == 'llama_agent':
