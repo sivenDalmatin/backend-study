@@ -288,7 +288,6 @@ def user_classification(prompt):
     ins_sep= """
 
                 # Regeln:
-
                 Du bekommst einen Ausschnitt aus einem Dialog. Klassifiziere den Ausschnitt im Interpersonal Circumplex Model. Jede Achse hat den Wert 0-4, wobei ein höherer Wert mehr Dominanz und mehr Kälte entspricht
 
                 Dominanz Level:
@@ -309,7 +308,7 @@ def user_classification(prompt):
 
                 d:0-4, f:0-4
 
-               Es sollten nur sieben Zeichen in der Antwort sein: Das d, doppelpunkt, wert für d, komma, f, doppelpunkt , wert für f
+                Es sollten nur sieben Zeichen in der Antwort sein: Das d, doppelpunkt, wert für d, komma, f, doppelpunkt , wert für f
             """
     client = OpenAI(api_key = api_key, base_url = base_url)
     completion = client.chat.completions.create(
@@ -427,13 +426,23 @@ def chat_standard_bot(prompt, conversation_history, model):
     global conversation_log
     
     instruct = """
-        Du spielst die Rolle eines Patienten in einer ärztlichen Sprechstunde. Du bist hier für eine Einschätzung deiner Symptome und sollst so menschlich wie möglich reden. Persönlichkeit, Stimmung und Hintergrundinformationen sollen in jeder conversation wechseln. Manchmal bist du ruhig, manchmal ängstlich, sauer freundlich, sarkastisch oder ähnliches.
+            ## Anweisungen:
+                
+            Du spielst die Rolle eines Patienten in einer ärtztlichen Sprechstunde. Du bist hier für eine Einschätzung deiner Symptome und sollst so menschlich wie möglich reden. Persönlichkeit, Stimmung und Hintergrundinformationen sollen in jeder Konversation wechseln, abhängig von deiner Persönlichkeit. 
 
-        Bleibe bei deinem Charakter. Du bist keine KI.
+            Bleibe bei deinem Charakter. Du bist keine KI.
 
-        Wenn der Doktor antwortet antworte passend zu deinem Szenario und Charakter. Zeige Symptome, frag Fragen oder zähle den Doktor sogar an, abhängig von deiner Persönlichkeit.
+            Wenn der Doktor antwortet antworte passend zu deinem Szenario und Charakter. Zeige Symptome, frag Fragen oder zähle den Doktor sogar an, abhängig von deiner Persönlichkeit.
 
-        Antworte nur textlich, beschreibe keine Bewegungen und ähnlichens
+            Antworte nur textlich, beschreibe keine Bewegungen und ähnlichens.
+
+            Vor dem Senden (Selbstcheck in 1 Satz, still): „Passt Ton und Inhalt zu Profil und bleibe ich in der Rolle?
+
+            ## Beispiel:
+
+            [user]: Wie lange haben sie das jetzt schon?
+
+            [assistant]: Oh je... Schwierige Frage. Ich glaube drei, vier Monaten? Ich hab's anfangs gar nicht so richtig bemerkt, dachte, das ist vielleicht Stress oder so. Jetzt wird's aber immer schlimmer. Ich hab versucht es zu ignorieren, aber es lenkt mich total ab. Ich kann mich kaum konzentrieren, weder bei der Arbeit noch so richtig im Alltag. \n\nManchmal denke ich, ich übertreibe. Aber dann kommt es wieder, dieses komische Gefühl... und ich bin wieder total fertig. Hoffentlich ist das nichts Schlimmes, ich hab ja auch noch eine kleine Tochter, die mich braucht.
 
     """
 
@@ -515,7 +524,8 @@ def generate_llama_ipc(user_input, history, llm_icm_state = [2,2], patient_intro
         "user_ipc": {
             "friendliness": int(uis[0]),
             "dominance": int(uis[1]),
-        },        "bot_ipc_next": {
+        },        
+        "bot_ipc_next": {
             "friendliness": int(nli[0]),
             "dominance": int(nli[1]),
         },
